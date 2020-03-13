@@ -13,7 +13,7 @@ class PostController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth', ['only' => ['create','store']]);
+        $this->middleware('auth', ['only' => ['create','store','edit','update','destroy']]);
     }
 
     public function index()
@@ -22,7 +22,7 @@ class PostController extends Controller
             'posts' => Post::orderBy('titulo')->paginate(10)
         ]);
     }
-    
+
     public function create()
     {
         return view ('posts.create',[
@@ -49,12 +49,11 @@ class PostController extends Controller
     }
 
     public function edit(Post $post)
-    {
-       
+    { 
         return view ('posts.edit',[
             'categorias' => Categoria::orderBy('categoria')->get(),
             'tags' => Tag::orderBy('tag')->get(),
-            'post' => Post::find($post->id)
+            'post' => Post::findOrFail($post->id)
         ]);
     }
     
