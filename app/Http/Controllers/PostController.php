@@ -22,7 +22,7 @@ class PostController extends Controller
             'posts' => Post::orderBy('titulo')->paginate(10)
         ]);
     }
-
+    
     public function create()
     {
         return view ('posts.create',[
@@ -44,18 +44,25 @@ class PostController extends Controller
 
     public function show(Post $post)
     {
+        $post = Post::find($post->id);
         return view('posts.show')->with(compact('post'));
     }
 
     public function edit(Post $post)
     {
-        $categorias = Categoria::orderBy('categoria')->get();
-        return view('posts.edit')->with(compact('post','categorias','tags'));
+       
+        return view ('posts.edit',[
+            'categorias' => Categoria::orderBy('categoria')->get(),
+            'tags' => Tag::orderBy('tag')->get(),
+            'post' => Post::find($post->id)
+        ]);
     }
+    
 
     public function update(Post $post)
     {
-        $post->update($this->val_post());
+        $post->update($this->val_post_update());
+        $post->tags()->sync(request('tags'));
         return redirect (route('posts.index'))->with('fm-success','Post criada com sucesso');
     }
 
@@ -78,7 +85,7 @@ class PostController extends Controller
     protected function val_post_update()
     {
         return request()->validate([
-            'titulo' => 'required|max:100|unique:posts',
+            'titulo' => 'required|max:100|unique:posts,id',
             'lead' => 'required|max:255',
             'corpo' => 'required',
             'categoria_id' => 'required|gt:0',
